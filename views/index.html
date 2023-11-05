@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Product List</title>
+    <!-- <link rel="stylesheet" type="text/css" href="styles.css"> -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body>
+    <h1>Product List</h1>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Sl. No</th>
+                <th>Category</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="product-table">
+            <!-- Table rows for products will be added here -->
+            
+        </tbody>
+    </table>
+    <br>
+    <div class="input-container">
+        <input type="text" id="category-input" placeholder="Enter a new category">
+        <br> <br>
+        <button onclick="addCategory()">Add Category</button>
+    </div>
+
+    <script>
+        let products = [];
+
+        function loadData() {
+            const productTable = document.getElementById('product-table');
+
+            // Make a POST request to your backend to get the products data
+            $.post('/getProducts', {}, (data) => {
+                products = data.products;
+
+                // Clear the existing table content
+                productTable.innerHTML = '';
+
+                // Create an object to keep track of categories
+                const uniqueCategories = {};
+
+                products.forEach((category) => {
+                    if (!uniqueCategories[category.category]) {
+                        const newRow = productTable.insertRow(-1);
+                        const cell1 = newRow.insertCell(0);
+                        const cell2 = newRow.insertCell(1);
+                        const cell3 = newRow.insertCell(2);
+
+                        cell1.textContent = Object.keys(uniqueCategories).length + 1; // Generates a unique number for each category
+                        cell2.textContent = category.category;
+
+                        // Create a button element
+                        const button = document.createElement('button');
+                        button.textContent = 'View';
+                        button.addEventListener('click', () => {
+                            sessionStorage.setItem('categoryChoosen',category.category)
+                            window.location.href = `/viewProductCategory`
+                        });
+
+                        // Append the button to the third cell
+                        cell3.appendChild(button);
+
+                        // Add the category to the uniqueCategories object
+                        uniqueCategories[category.category] = true;
+                    }
+                });
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", loadData);
+
+        function addCategory() {
+            const categoryInput = document.getElementById('category-input').value;
+
+            if (categoryInput.trim() !== '') {
+                // Add the new category to the products array
+                $.post('/addCategory', { category: categoryInput }, (data) => {
+                    console.log("responseData ", data);
+                    loadData(); // Refresh the product table after adding a new category
+                });
+                // Clear the input field
+                document.getElementById('category-input').value = '';
+            }
+        }
+    </script>
+</body>
+
+</html>

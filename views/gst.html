@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cart</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 50%;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .purchase-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 5px 10px;
+            text-decoration: none;
+            display: inline-block;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h2>Add Product from Dropdown</h2>
+    <div>
+        <label for="category-select">Select a Category:</label>
+        <select id="category-select">
+            <option value="">Select a Category</option> <!-- Default option -->
+        </select>
+    
+        <label for="product-select">Select a Product:</label>
+        <select id="product-select">
+            <option value="">Select a Product</option> <!-- Default option -->
+        </select>
+    
+        <button onclick="addProductFromDropdown()">Add to Cart</button>
+    </div>
+    
+
+    <h2>Cart</h2>
+    <table id="cart-table">
+        <tr>
+            <th>Category</th>
+            <th>Product</th>
+            <th>Price (Rs)</th>
+            <th>GST</th>
+        </tr>
+    </table>
+    <br>
+    <button onclick="generateGSTBill()">Generate GST Bill</button>
+
+    <div id="bill-container" style="display: none;">
+        <h2>Bill</h2>
+        <table id="bill-table">
+            <tr>
+                <th>Category</th>
+                <th>Product</th>
+                <th>Price (Rs)</th>
+                <th>GST</th>
+                <th>Total Cost</th>
+            </tr>
+        </table>
+        <table id="bill-total-table" style="margin-top: 20px;">
+            <tr>
+                <td>Bill Total:</td>
+                <td id="bill-total"></td>
+            </tr>
+        </table>
+    </div>
+
+    <script>
+        let cart = [];
+        let products = [
+    {
+        category: 'Food',
+        gst:"5",
+        items: [
+            { name: 'Rice', price: 140 },
+            { name: 'Bread', price: 120 },
+            { name: 'Milk', price: 60 },
+        ],
+    },
+    {
+        category: 'Electronics',
+        gst:"12",
+        items: [
+            { name: 'Laptop', price: 40000.00 },
+            { name: 'Smartphone', price: 25000.00 },
+            { name: 'TV', price: 34899.99 },
+        ],
+    },
+];
+
+
+        function loadData() {
+            // const productTable = document.getElementById('product-table');
+
+            // Make a POST request to your backend to get the products data
+            $.post('/getProducts', {}, (data) => {
+                products = data.products;
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", loadData);
+
+        const categorySelect = document.getElementById('category-select');
+        const productSelect = document.getElementById('product-select');
+
+        function populateCategories() {
+            products.forEach((product) => {
+                categorySelect.options.add(new Option(product.category, product.category));
+            });
+        }
+
+        function populateProducts(category) {
+            productSelect.innerHTML = '';
+            const selectedCategoryData = products.find((product) => product.category === category);
+
+            if (selectedCategoryData) {
+                selectedCategoryData.items.forEach((item) => {
+                    productSelect.options.add(new Option(`${item.name} (Rs ${item.price})`, `${category}|${item.name}|${item.price}`));
+                });
+            }
+        }
+
+        categorySelect.addEventListener('change', () => {
+            const selectedCategory = categorySelect.value;
+            populateProducts(selectedCategory);
+        });
+
+        function addToCart(category, productName, productPrice, gstAmount) {
+            cart.push({ category: category, name: productName, price: productPrice, gst: gstAmount });
+            updateCartTable();
+        }
+
+        function updateCartTable() {
+            const cartTable = document.getElementById('cart-table');
+            cartTable.innerHTML = '<tr><th>Category</th><th>Product</th><th>Price (Rs)</th><th>GST</th></tr>';
+            let totalCost = 0;
+            let totalGST = 0;
+
+            cart.forEach((product) => {
+                const newRow = cartTable.insertRow(-1);
+                const cell1 = newRow.insertCell(0);
+                const cell2 = newRow.insertCell(1);
+                const cell3 = newRow.insertCell(2);
+                const cell4 = newRow.insertCell(3);
+
+                cell1.innerHTML = product.category;
+                cell2.innerHTML = product.name;
+                cell3.innerHTML = product.price;
+                cell4.innerHTML = product.gst;
+
+                totalCost += product.price;
+                totalGST += parseFloat(product.gst);
+            });
+
+            updateBillTable(totalCost, totalGST);
+        }
+
+        function generateGSTBill() {
+            const billContainer = document.getElementById('bill-container');
+            billContainer.style.display = 'block';
+        }
+
+        function updateBillTable(totalCost, totalGST) {
+            const billTable = document.getElementById('bill-table');
+            const billTotalCell = document.getElementById('bill-total');
+
+            billTable.innerHTML = '<tr><th>Category</th><th>Product</th><th>Price (Rs)</th><th>GST </th><th>Total Cost</th></tr>';
+
+            cart.forEach((product) => {
+                const newRow = billTable.insertRow(-1);
+                const cell1 = newRow.insertCell(0);
+                const cell2 = newRow.insertCell(1);
+                const cell3 = newRow.insertCell(2);
+                const cell4 = newRow.insertCell(3);
+                const cell5 = newRow.insertCell(4);
+
+                cell1.innerHTML = product.category;
+                cell2.innerHTML = product.name;
+                cell3.innerHTML = product.price;
+                cell4.innerHTML = product.gst;
+                cell5.innerHTML = (parseFloat(product.price) + parseFloat(product.gst)).toFixed(2);
+            });
+
+            const billTotal = (totalCost + totalGST).toFixed(2);
+            billTotalCell.innerHTML = `Rs ${billTotal}`;
+        }
+
+        function addProductFromDropdown() {
+            const selectedOption = productSelect.options[productSelect.selectedIndex].value;
+            const [category, productName, productPrice] = selectedOption.split('|');
+            let gstRate = 0;
+            products.forEach((product) => {
+                if(product.category==category){
+                    console.log(product.category+": "+product.gst)
+                    gstRate = product.gst;
+                }
+            });
+            let gstAmount = `${(gstRate/100*productPrice).toFixed(2)} (${gstRate}%)`;
+            console.log(gstRate, productPrice, gstAmount)
+            addToCart(category, productName, parseFloat(productPrice),gstAmount);
+        }
+
+        populateCategories();
+    </script>
+</body>
+</html>
