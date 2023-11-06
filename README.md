@@ -5,6 +5,32 @@ The code is written in JavaScript and uses the Express.js framework to create a 
 It also uses several JavaScript libraries, such as "body-parser" for handling HTTP request data, and "ejs" for rendering HTML templates. 
 This code is designed for server-side web development using Node.js, which is a runtime environment for executing JavaScript code on the server.
 
+# Product List Node.js Server
+The Product List Node.js Server is a backend server that works in conjunction with the Product List Web Page. It handles data requests, including retrieving products and adding new product categories and products to the list.
+# Features
+•	Serve the HTML page.
+•	Handle data requests:
+•	Retrieve the list of products.
+•	Add new product categories.
+•	View product categories.
+•	Add new products to a category.
+# Usage
+1.	Server Setup:
+•	Ensure you have Node.js installed on your system.
+2.	Clone the Repository:
+•	Clone or download the repository containing the server code.
+3.	Install Dependencies:
+•	In the server directory, run npm install to install the required dependencies.
+4.	Start the Server:
+•	Run node app.js to start the server.
+5.	Access the Web Page:
+•	Open the Product List Web Page in a web browser to interact with the application.
+# Dependencies
+•	Express.js: A web application framework for Node.js.
+•	body-parser: A middleware for parsing HTTP request data.
+•	ejs: A template engine for rendering HTML templates.
+.
+
 # Fount end code Web Application (index.html)
 
 The Product List Web Application is a simple web page that allows users to view and manage product categories. 
