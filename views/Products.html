@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Food Products</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -8,14 +9,18 @@
             border-collapse: collapse;
             width: 50%;
         }
-        th, td {
+
+        th,
+        td {
             border: 1px solid black;
             padding: 8px;
             text-align: left;
         }
+
         th {
             background-color: #f2f2f2;
         }
+
         .purchase-button {
             background-color: #4CAF50;
             color: white;
@@ -27,6 +32,7 @@
         }
     </style>
 </head>
+
 <body>
     <h1 id="pageHeading">Food Products</h1>
     <table id="product-table">
@@ -49,10 +55,8 @@
     </div><br>
     <button onclick="addProduct()">Add Product</button>
 
-    <!-- Purchase button after the table -->
-    
-
     <script>
+        // Retrieve the selected category from session storage
         let category = sessionStorage.getItem('categoryChoosen');
         const productTable = document.getElementById('product-table');
         document.getElementById('pageHeading').innerHTML = `${category} Products`;
@@ -67,26 +71,28 @@
                 alert('Please enter both product name and price.');
                 return;
             } else {
+                // Send a POST request to the backend to add a new product
                 $.post('/addProduct', { productName, productPrice, category }, (data) => {
                     console.log(data);
-                    loadData();
+                    loadData(); // Refresh the product table after adding a new product
                 });
             }
         }
 
         // Function to handle the purchase action
         function purchaseProducts() {
+            // Redirect to the purchase page
             window.location.href = '/puchaseProduct';
         }
 
-        // Function to load data from POST request
+        // Function to load data from the backend
         function loadData() {
             // Clear the existing table data
             while (productTable.rows.length > 1) {
                 productTable.deleteRow(1);
             }
 
-            // Make a POST request to your backend to get the products data
+            // Make a POST request to the backend to get the products data
             $.post('/getProducts', {}, (data) => {
                 // Filter data for the selected category
                 const categoryData = data.products.find((categoryData) => categoryData.category === category);
@@ -110,4 +116,5 @@
         document.addEventListener("DOMContentLoaded", loadData);
     </script>
 </body>
+
 </html>

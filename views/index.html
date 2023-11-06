@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-
+    
 <head>
     <title>Product List</title>
     <!-- <link rel="stylesheet" type="text/css" href="styles.css"> -->
@@ -9,7 +9,6 @@
 
 <body>
     <h1>Product List</h1>
-
     <table border="1">
         <thead>
             <tr>
@@ -19,8 +18,6 @@
             </tr>
         </thead>
         <tbody id="product-table">
-            <!-- Table rows for products will be added here -->
-            
         </tbody>
     </table>
     <br>
@@ -33,6 +30,7 @@
     <script>
         let products = [];
 
+        // Function to load data from the server and populate the product table
         function loadData() {
             const productTable = document.getElementById('product-table');
 
@@ -46,6 +44,7 @@
                 // Create an object to keep track of categories
                 const uniqueCategories = {};
 
+                // Iterate through the products and display them in the table
                 products.forEach((category) => {
                     if (!uniqueCategories[category.category]) {
                         const newRow = productTable.insertRow(-1);
@@ -53,15 +52,16 @@
                         const cell2 = newRow.insertCell(1);
                         const cell3 = newRow.insertCell(2);
 
-                        cell1.textContent = Object.keys(uniqueCategories).length + 1; // Generates a unique number for each category
+                        // Generate a unique number for each category
+                        cell1.textContent = Object.keys(uniqueCategories).length + 1;
                         cell2.textContent = category.category;
 
-                        // Create a button element
+                        // Create a button element for viewing the category
                         const button = document.createElement('button');
                         button.textContent = 'View';
                         button.addEventListener('click', () => {
-                            sessionStorage.setItem('categoryChoosen',category.category)
-                            window.location.href = `/viewProductCategory`
+                            sessionStorage.setItem('categoryChoosen', category.category);
+                            window.location.href = `/viewProductCategory`;
                         });
 
                         // Append the button to the third cell
@@ -74,17 +74,20 @@
             });
         }
 
+        // Trigger the loadData function when the DOM is fully loaded
         document.addEventListener("DOMContentLoaded", loadData);
 
+        // Function to add a new category
         function addCategory() {
             const categoryInput = document.getElementById('category-input').value;
 
             if (categoryInput.trim() !== '') {
-                // Add the new category to the products array
+                // Add the new category to the products array by making a POST request
                 $.post('/addCategory', { category: categoryInput }, (data) => {
                     console.log("responseData ", data);
                     loadData(); // Refresh the product table after adding a new category
                 });
+
                 // Clear the input field
                 document.getElementById('category-input').value = '';
             }

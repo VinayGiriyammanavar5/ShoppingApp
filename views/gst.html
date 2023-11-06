@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Cart</title>
+    <!-- // Include jQuery library to enable JavaScript functionality -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         table {
@@ -96,12 +97,19 @@
             { name: 'TV', price: 34899.99 },
         ],
     },
+    {
+        category: 'Footwear',
+        gst: "8",
+        items: [
+            { name: 'Shoes', price: 200 },
+            { name: 'Socks', price: 80 },
+            { name: 'Sandals', price: 150 },
+        ]
+    }
 ];
 
 
         function loadData() {
-            // const productTable = document.getElementById('product-table');
-
             // Make a POST request to your backend to get the products data
             $.post('/getProducts', {}, (data) => {
                 products = data.products;
@@ -114,12 +122,14 @@
         const productSelect = document.getElementById('product-select');
 
         function populateCategories() {
+            // Populate the category dropdown with available categories
             products.forEach((product) => {
                 categorySelect.options.add(new Option(product.category, product.category));
             });
         }
 
         function populateProducts(category) {
+            // Populate the product dropdown based on the selected category
             productSelect.innerHTML = '';
             const selectedCategoryData = products.find((product) => product.category === category);
 
@@ -131,16 +141,19 @@
         }
 
         categorySelect.addEventListener('change', () => {
+            // Event listener to detect changes in the category dropdown
             const selectedCategory = categorySelect.value;
             populateProducts(selectedCategory);
         });
 
         function addToCart(category, productName, productPrice, gstAmount) {
+             // Add a selected product to the cart
             cart.push({ category: category, name: productName, price: productPrice, gst: gstAmount });
             updateCartTable();
         }
 
         function updateCartTable() {
+             // Update the cart table with the selected products
             const cartTable = document.getElementById('cart-table');
             cartTable.innerHTML = '<tr><th>Category</th><th>Product</th><th>Price (Rs)</th><th>GST</th></tr>';
             let totalCost = 0;
@@ -166,11 +179,13 @@
         }
 
         function generateGSTBill() {
+            // Display the GST bill when the button is clicked
             const billContainer = document.getElementById('bill-container');
             billContainer.style.display = 'block';
         }
 
         function updateBillTable(totalCost, totalGST) {
+            // Update the GST bill table
             const billTable = document.getElementById('bill-table');
             const billTotalCell = document.getElementById('bill-total');
 
@@ -196,6 +211,7 @@
         }
 
         function addProductFromDropdown() {
+             // Add a product to the cart from the dropdown selection
             const selectedOption = productSelect.options[productSelect.selectedIndex].value;
             const [category, productName, productPrice] = selectedOption.split('|');
             let gstRate = 0;
@@ -209,7 +225,7 @@
             console.log(gstRate, productPrice, gstAmount)
             addToCart(category, productName, parseFloat(productPrice),gstAmount);
         }
-
+ // Populate the category dropdown with available categories
         populateCategories();
     </script>
 </body>
