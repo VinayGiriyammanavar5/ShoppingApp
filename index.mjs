@@ -75,14 +75,25 @@ app.post('/getProducts', (req, res) => {
 
 // Route to add a new product category
 app.post('/addCategory', (req, res) => {
-    console.log("/addCategory", req.body);
+    const { category, defaultGST } = req.body;
+
+    // Check if the category already exists
+    const existingCategory = products.find((product) => product.category === category);
+
+    if (existingCategory) {
+        return res.status(400).json({ message: 'Category already exists' });
+    }
+
+    // Add the new category to the products array with the default GST rate
     products.push({
-        category: req.body.category,
-        items: []
+        category,
+        gst: defaultGST,
+        items: [],
     });
-    console.log(products)
-    res.status(200).json({ "message": "OK" });
-})
+
+    res.status(200).json({ message: 'Category added successfully' });
+});
+
 
 // Route to view product categories
 app.get('/viewProductCategory', (req, res) => {
@@ -103,6 +114,13 @@ app.post('/addProduct', (req, res) => {
     } else {
         res.status(400).json({ message: 'Category not found' });
     }
+});
+
+
+// Route to get a list of categories
+app.get('/getCategories', (req, res) => {
+    const categories = products.map((product) => product.category);
+    res.json({ categories });
 });
 
 // Start the server

@@ -79,34 +79,31 @@
     <script>
         let cart = [];
         let products = [
-    {
-        category: 'Food',
-        gst:"5",
-        items: [
-            { name: 'Rice', price: 140 },
-            { name: 'Bread', price: 120 },
-            { name: 'Milk', price: 60 },
-        ],
-    },
-    {
-        category: 'Electronics',
-        gst:"12",
-        items: [
-            { name: 'Laptop', price: 40000.00 },
-            { name: 'Smartphone', price: 25000.00 },
-            { name: 'TV', price: 34899.99 },
-        ],
-    },
-    {
-        category: 'Footwear',
-        gst: "8",
-        items: [
-            { name: 'Shoes', price: 200 },
-            { name: 'Socks', price: 80 },
-            { name: 'Sandals', price: 150 },
-        ]
-    }
+   
 ];
+
+
+function updateCategoryDropdown() {
+        const categorySelect = document.getElementById('category-select');
+
+        // Make a GET request to the backend to get the list of categories
+        fetch('/getCategories')
+            .then(response => response.json())
+            .then(data => {
+                data.categories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category;
+                    option.text = category;
+                    categorySelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching categories:', error);
+            });
+    }
+
+    // Initialize the category dropdown
+    updateCategoryDropdown();
 
 
         function loadData() {

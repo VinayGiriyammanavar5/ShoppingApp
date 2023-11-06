@@ -77,21 +77,38 @@
         // Trigger the loadData function when the DOM is fully loaded
         document.addEventListener("DOMContentLoaded", loadData);
 
-        // Function to add a new category
-        function addCategory() {
-            const categoryInput = document.getElementById('category-input').value;
+       
+// Function to add a new category
+function addCategory() {
+    const categoryInput = document.getElementById('category-input').value;
+    const defaultGSTInput = 22; // Set the default GST rate as needed
 
-            if (categoryInput.trim() !== '') {
-                // Add the new category to the products array by making a POST request
-                $.post('/addCategory', { category: categoryInput }, (data) => {
-                    console.log("responseData ", data);
+    if (categoryInput.trim() !== '') {
+        // Add the new category to the products array by making a POST request
+        fetch('/addCategory', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ category: categoryInput, defaultGST: defaultGSTInput }),
+        })
+            .then((response) => {
+                if (response.status === 200) {
+                    console.log("Category added successfully");
                     loadData(); // Refresh the product table after adding a new category
-                });
+                } else {
+                    console.error("Failed to add category");
+                }
+            })
+            .catch((error) => {
+                console.error("Error adding category:", error);
+            });
 
-                // Clear the input field
-                document.getElementById('category-input').value = '';
-            }
-        }
+        // Clear the input field
+        document.getElementById('category-input').value = '';
+    }
+}
+  
     </script>
 </body>
 
